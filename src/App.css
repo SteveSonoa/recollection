@@ -41,3 +41,14 @@ button {
         transform: rotate(360deg);
     }
 }
+
+#background-video {
+    min-height: 100vh;
+    min-width: 100vw;
+    z-index: -2;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

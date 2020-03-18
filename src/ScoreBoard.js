@@ -9,8 +9,11 @@ const ScoreBoard = ({score}) => (
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '400px',
+            fontSize: '600px',
             fontWeight: '900',
+            color: '#ffffff',
+            textShadow:
+                '10px 0 #00B7FF, 0 10px #00B7FF, -10px 0  #00B7FF, 0 -10px #00B7FF, 10px 10px #00B7FF, -10px -10px #00B7FF, 10px -10px #00B7FF, -10px 10px #00B7FF',
         }}
     >
         {score}

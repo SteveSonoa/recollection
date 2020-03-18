@@ -2,14 +2,18 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import ScoreBoard from './ScoreBoard';
 import ExternalPortal from './ExternalPortal';
+import BackgroundVideo from './BackgroundVideo';
+import SFX from './SFX';
 
 class Game extends Component {
     constructor() {
         super();
         this.state = {
+            backgroundVideo: 'checkerboard_background.mp4',
             isNumberVisible: false,
             isPlaying: false,
             isPortalVisible: false,
+            isScoreVisible: false,
             score: 0,
             secondsLeft: 0,
         };
@@ -20,6 +24,10 @@ class Game extends Component {
         window.addEventListener('beforeunload', () => {
             this.togglePortal(false);
         });
+        this.setTimerSfx = document.getElementById('fill-timer');
+        this.losePointSfx = document.getElementById('lose-point');
+        this.gainPointSfx = document.getElementById('correct-answer');
+        this.clockTickSfx = document.getElementById('clock-tick');
     };
 
     componentWillUnmount() {
@@ -31,6 +39,7 @@ class Game extends Component {
             this.setState({
                 secondsLeft: this.props.timeAllowed,
             });
+            this.setTimerSfx.play();
 
             setTimeout(() => {
                 this.setState({
@@ -46,6 +55,7 @@ class Game extends Component {
         this.setState({
             secondsLeft: secondsLeft,
         });
+        this.clockTickSfx.play();
 
         // Check if we're at zero.
         if (secondsLeft === 0) {
@@ -71,41 +81,11 @@ class Game extends Component {
         ) {
             this.setState({
                 isPlaying: true,
+                isScoreVisible: true,
             });
             this.timer = setInterval(this.countDown, 1000);
         }
     };
-
-    // startTimer = () => {
-    //     const {isPlaying, secondsLeft, isNumberVisible} = this.state;
-    //     if (!isPlaying && secondsLeft === 60 && isNumberVisible) {
-    //         this.setState({
-    //             isPlaying: true,
-    //         });
-    //     }
-    // };
-
-    // updateTimer = () => {
-    //     const {isPlaying, secondsLeft} = this.state;
-    //     if (isPlaying && secondsLeft >= 0) {
-    //         this.interval = setInterval(() => {
-    //             this.setState({
-    //                 secondsLeft: secondsLeft - 1,
-    //             });
-    //         }, 1000);
-    //     } else if (isPlaying && secondsLeft < 0) {
-    //         this.setState({
-    //             secondsLeft: 0,
-    //             isPortalVisible: false,
-    //         });
-    //         setTimeout(() => {
-    //             this.setState({
-    //                 isNumberVisible: false,
-    //             });
-    //         }, 1500);
-    //         clearInterval(this.interval);
-    //     }
-    // };
 
     resetScore = () => {
         this.setState({
@@ -113,10 +93,26 @@ class Game extends Component {
         });
     };
 
-    addToScore = () => {
-        this.setState({
-            score: this.state.score + 1,
-        });
+    addToScore = (_, isOkayToAdd = this.state.isPlaying) => {
+        if (isOkayToAdd) {
+            this.setState({
+                score: this.state.score + 1,
+            });
+            this.gainPointSfx.pause();
+            this.gainPointSfx.currentTime = 0.0;
+            this.gainPointSfx.play();
+        }
+    };
+
+    subtractFromScore = () => {
+        const {score} = this.state;
+
+        if (score > 0) {
+            this.losePointSfx.play();
+            this.setState({
+                score: score - 1,
+            });
+        }
     };
 
     togglePortal = (newValue = null) => {
@@ -128,6 +124,16 @@ class Game extends Component {
         });
     };
 
+    toggleScoreVisibility = () => {
+        const {isPlaying, isScoreVisible} = this.state;
+
+        if (!isPlaying) {
+            this.setState({
+                isScoreVisible: !isScoreVisible,
+            });
+        }
+    };
+
     hackPortal = () => {
         this.setState({});
     };
@@ -136,6 +142,7 @@ class Game extends Component {
 
     render() {
         const {
+            backgroundVideo,
             isNumberVisible,
             isPlaying,
             isPortalVisible,
@@ -157,12 +164,24 @@ class Game extends Component {
 
         return (
             <div className='game-container'>
+                <BackgroundVideo video={backgroundVideo} />
+                <SFX id='correct-answer' sfxFile='correct.mp3' />
+                <SFX id='lose-point' sfxFile='wrong.mp3' />
+                <SFX id='fill-timer' sfxFile='Magic_Chime.mp3' />
+                <SFX id='clock-tick' sfxFile='tick.mp3' />
                 <div
                     style={{
                         position: 'relative',
                         height: '200px',
                         width: '100vw',
                         overflow: 'hidden',
+                        cursor: 'pointer',
+                    }}
+                    onClick={e => {
+                        this.togglePortal();
+                        setTimeout(() => {
+                            this.setState({});
+                        }, 1000);
                     }}
                 >
                     <img
@@ -266,21 +285,11 @@ class Game extends Component {
                             alignItems: 'center',
                             justifyContent: 'center',
                         }}
-                    >
-                        <button
-                            style={buttonStyle}
-                            onClick={e => {
-                                this.togglePortal();
-                                setTimeout(() => {
-                                    this.setState({});
-                                }, 1000);
-                            }}
-                        >
-                            Toggle Portal
-                        </button>
-                    </div>
+                    />
                     <div style={{width: '50vw', height: '100%', float: 'left'}}>
-                        <ScoreBoard score={score} />
+                        {this.state.isScoreVisible && (
+                            <ScoreBoard score={score} />
+                        )}
                     </div>
                 </div>
 
@@ -300,6 +309,28 @@ class Game extends Component {
                         </button>
                         <button style={buttonStyle} onClick={this.addToScore}>
                             Add Point
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={e => this.addToScore(e, true)}
+                        >
+                            Add Point After Timer Ends
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={this.subtractFromScore}
+                        >
+                            Remove Point
+                        </button>
+                        <button
+                            style={{
+                                ...buttonStyle,
+                                cursor: isPlaying ? 'not-allowed' : 'pointer',
+                            }}
+                            onClick={this.toggleScoreVisibility}
+                            disabled={this.isPlaying}
+                        >
+                            {this.state.isScoreVisible ? 'Hide' : 'Show'} Score
                         </button>
                         <p>You are {!isPlaying && 'not'} playing.</p>
                     </ExternalPortal>
