@@ -8,7 +8,7 @@ const SFX = ({id, sfxFile}) => (
 );
 
 SFX.propTypes = {
-    className: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
     sfxFile: PropTypes.string.isRequired,
 };
 

@@ -68,6 +68,7 @@ class Game extends Component {
                     isNumberVisible: false,
                 });
             }, 1500);
+            this.timer = 0;
         }
     };
 
