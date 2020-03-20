@@ -52,3 +52,56 @@ button {
     left: 0;
     right: 0;
 }
+
+input {
+    width: 100%;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    font-weight: 900;
+}
+
+input::placeholder {
+    font-size: 48px;
+    font-weight: normal;
+    color: #ccc;
+    font-style: italic;
+}
+
+input:focus {
+    outline: 0;
+}
+
+.player-info-container {
+    width: 800px;
+    overflow: hidden;
+}
+
+#player-name {
+    height: 150px;
+}
+
+#player-scores {
+    height: 100px;
+}
+
+#player-scores div {
+    font-size: 72px;
+    color: #fff;
+    font-weight: 900;
+    width: 33.3333%;
+    height: 100%;
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#total-score {
+    font-size: 160px;
+    color: #fff;
+    font-weight: 900;
+    text-align: center;
+    height: 200px;
+}

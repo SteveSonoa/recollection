@@ -4,16 +4,31 @@ import ScoreBoard from './ScoreBoard';
 import ExternalPortal from './ExternalPortal';
 import BackgroundVideo from './BackgroundVideo';
 import SFX from './SFX';
+import PlayerInfo from './PlayerInfo';
+
+/** TODO LIST
+ * Add new sfx for timer tick when it reaches 5 seconds or less
+ * Add sfx for when timer ends (cheers for high score, disappointed "oh" for low score)
+ * Add sfx for when score appears
+ * Add sfx for when score moves underneath name (when the round resets)
+ * Add bkgnd for player info container
+ * Add bkgnd for player info areas (name, round scores, total score)
+ * Break sections into components
+ */
 
 class Game extends Component {
     constructor() {
         super();
         this.state = {
+            allScores: [],
             backgroundVideo: 'checkerboard_background.mp4',
+            currentRound: 1,
             isNumberVisible: false,
             isPlaying: false,
             isPortalVisible: false,
             isScoreVisible: false,
+            name: '',
+            nameSize: 120,
             score: 0,
             secondsLeft: 0,
         };
@@ -135,11 +150,39 @@ class Game extends Component {
         }
     };
 
-    hackPortal = () => {
-        this.setState({});
+    updateScoreboard = () => {
+        const {isPlaying, score, currentRound} = this.state;
+
+        if (!isPlaying) {
+            const allScores = [...this.state.allScores, score];
+            this.setState({
+                allScores,
+                currentRound: currentRound + 1,
+            });
+
+            this.toggleScoreVisibility();
+            this.resetScore();
+        }
     };
 
-    setupPortal = () => {};
+    handleChange = e => {
+        const {name, value} = e.target;
+        this.setState({
+            [name]: value,
+        });
+    };
+
+    increaseNameSize = () => {
+        this.setState({
+            nameSize: this.state.nameSize + 8,
+        });
+    };
+
+    decreaseNameSize = () => {
+        this.setState({
+            nameSize: this.state.nameSize - 8,
+        });
+    };
 
     render() {
         const {
@@ -284,9 +327,16 @@ class Game extends Component {
                             float: 'left',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
+                            justifyContent: 'flex-end',
                         }}
-                    />
+                    >
+                        <PlayerInfo
+                            name={this.state.name}
+                            nameSize={this.state.nameSize}
+                            scores={this.state.allScores}
+                            handleChange={this.handleChange}
+                        />
+                    </div>
                     <div style={{width: '50vw', height: '100%', float: 'left'}}>
                         {this.state.isScoreVisible && (
                             <ScoreBoard score={score} />
@@ -302,27 +352,6 @@ class Game extends Component {
                         >
                             Fill The Timer
                         </button>
-                        <button style={buttonStyle} onClick={this.startTimer}>
-                            Start!
-                        </button>
-                        <button style={buttonStyle} onClick={this.resetScore}>
-                            Reset Score
-                        </button>
-                        <button style={buttonStyle} onClick={this.addToScore}>
-                            Add Point
-                        </button>
-                        <button
-                            style={buttonStyle}
-                            onClick={e => this.addToScore(e, true)}
-                        >
-                            Add Point After Timer Ends
-                        </button>
-                        <button
-                            style={buttonStyle}
-                            onClick={this.subtractFromScore}
-                        >
-                            Remove Point
-                        </button>
                         <button
                             style={{
                                 ...buttonStyle,
@@ -333,7 +362,44 @@ class Game extends Component {
                         >
                             {this.state.isScoreVisible ? 'Hide' : 'Show'} Score
                         </button>
+                        <button style={buttonStyle} onClick={this.startTimer}>
+                            Start!
+                        </button>
+                        <button style={buttonStyle} onClick={this.addToScore}>
+                            Add Point
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={this.subtractFromScore}
+                        >
+                            Remove Point
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={e => this.addToScore(e, true)}
+                        >
+                            Add Point After Timer Ends
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={this.updateScoreboard}
+                        >
+                            Start New Round
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={this.decreaseNameSize}
+                        >
+                            Smaller Name
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={this.increaseNameSize}
+                        >
+                            Larger Name
+                        </button>
                         <p>You are {!isPlaying && 'not'} playing.</p>
+                        <p>You are on round {this.state.currentRound}.</p>
                     </ExternalPortal>
                 )}
             </div>
