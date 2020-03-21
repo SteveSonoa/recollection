@@ -62,13 +62,6 @@ input {
     font-weight: 900;
 }
 
-input::placeholder {
-    font-size: 48px;
-    font-weight: normal;
-    color: #ccc;
-    font-style: italic;
-}
-
 input:focus {
     outline: 0;
 }
@@ -76,26 +69,70 @@ input:focus {
 .player-info-container {
     width: 800px;
     overflow: hidden;
+
+    background: rgba(112, 49, 155, 0.85);
+    border-radius: 25px;
+    padding: 10px;
+    border: 5px solid #ff0;
+    box-sizing: border-box;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
 
 #player-name {
-    height: 150px;
+    padding: 25px 0;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-weight: 900;
+    box-sizing: border-box;
+    border-radius: 25px;
+    border: 5px solid #ed558c;
+    background: rgba(0, 0, 0, 0.25);
+    text-shadow: 2px 2px #ed558c, -2px 2px #ed558c, 2px -2px #ed558c,
+        -2px -2px #ed558c;
 }
 
 #player-scores {
     height: 100px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
 }
 
 #player-scores div {
     font-size: 72px;
     color: #fff;
     font-weight: 900;
-    width: 33.3333%;
     height: 100%;
-    float: left;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 3px solid #ed558c;
+    border-radius: 10px;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    margin: 0 5px;
+    background: rgba(0, 0, 0, 0.25);
+    position: relative;
+    padding-top: 10px;
+}
+
+#player-scores div::before {
+    content: 'ROUND 1';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-size: 12px;
+    font-weight: 900;
+}
+
+#player-scores div:first-child {
+    margin-left: 0;
+}
+
+#player-scores div:last-child {
+    margin-right: 0;
 }
 
 #total-score {
@@ -104,4 +141,32 @@ input:focus {
     font-weight: 900;
     text-align: center;
     height: 200px;
+    border: 3px solid #ed558c;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.25);
+    position: relative;
+    padding-top: 10px;
+}
+
+#total-score::before {
+    content: 'TOTAL SCORE';
+    font-size: 14px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-weight: 900;
+}
+
+.portal-sections div {
+    margin-bottom: 10px;
+}
+
+.left-side {
+    width: 50vw;
+    height: 100%;
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }

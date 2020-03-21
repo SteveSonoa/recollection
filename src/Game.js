@@ -5,6 +5,7 @@ import ExternalPortal from './ExternalPortal';
 import BackgroundVideo from './BackgroundVideo';
 import SFX from './SFX';
 import PlayerInfo from './PlayerInfo';
+import CountdownTimer from './CountdownTimer';
 
 /** TODO LIST
  * Add new sfx for timer tick when it reaches 5 seconds or less
@@ -124,10 +125,12 @@ class Game extends Component {
         const {score} = this.state;
 
         if (score > 0) {
-            this.losePointSfx.play();
             this.setState({
                 score: score - 1,
             });
+            this.losePointSfx.pause();
+            this.losePointSfx.currentTime = 0.0;
+            this.losePointSfx.play();
         }
     };
 
@@ -167,6 +170,7 @@ class Game extends Component {
 
     handleChange = e => {
         const {name, value} = e.target;
+        console.log(name, value);
         this.setState({
             [name]: value,
         });
@@ -193,17 +197,11 @@ class Game extends Component {
             score,
             secondsLeft,
         } = this.state;
-        const {timeAllowed} = this.props;
-
-        const calculatePercent = () =>
-            ((secondsLeft / timeAllowed) * 100).toFixed(3);
-        const calculateRadius = () =>
-            secondsLeft * Math.floor(360 / timeAllowed);
-        const imageWidth = 200;
 
         const buttonStyle = {
             fontSize: '18px',
             padding: '5px 15px',
+            margin: '5px',
         };
 
         return (
@@ -213,106 +211,17 @@ class Game extends Component {
                 <SFX id='lose-point' sfxFile='wrong.mp3' />
                 <SFX id='fill-timer' sfxFile='Magic_Chime.mp3' />
                 <SFX id='clock-tick' sfxFile='tick.mp3' />
-                <div
-                    style={{
-                        position: 'relative',
-                        height: '200px',
-                        width: '100vw',
-                        overflow: 'hidden',
-                        cursor: 'pointer',
-                    }}
-                    onClick={e => {
+
+                <CountdownTimer
+                    activatePortal={e => {
                         this.togglePortal();
                         setTimeout(() => {
                             this.setState({});
                         }, 1000);
                     }}
-                >
-                    <img
-                        src='/stopwatch_logo.png'
-                        alt='60 Second Recollection'
-                        style={{
-                            width: `${imageWidth}px`,
-                            position: 'absolute',
-                            top: '0',
-                            left: '0',
-                            zIndex: '2',
-                        }}
-                    />
-                    <div
-                        className='clock-hand'
-                        style={{
-                            borderRadius: '50%',
-                            height: '150px',
-                            width: '150px',
-                            transform: `rotate(${calculateRadius()}deg)`,
-                            textAlign: 'center',
-                            transition: 'transform 1s linear',
-                            zIndex: '3',
-                            position: 'absolute',
-                            top: '29px',
-                            left: '29px',
-                            fontSize: '60px',
-                            fontWeight: '900',
-                            color: '#FFD280',
-                        }}
-                    >
-                        |
-                    </div>
-                    <h1
-                        style={{
-                            position: 'absolute',
-                            top: '31px',
-                            left: '5px',
-                            textAlign: 'center',
-                            color: '#652C90',
-                            zIndex: '4',
-                            fontSize: '120px',
-                            margin: '0',
-                            width: `${imageWidth}px`,
-                            textShadow: '0 0 10px #ffffff',
-                        }}
-                    >
-                        {isNumberVisible ? secondsLeft : ''}
-                    </h1>
-                    <img
-                        src='/title_words.png'
-                        alt='60 Second Recollection'
-                        style={{
-                            height: `calc(${imageWidth / 2}px - ${imageWidth /
-                                20}px)`,
-                            position: 'absolute',
-                            top: `calc(${imageWidth / 4}px + 15px)`,
-                            left: '50%',
-                            zIndex: '2',
-                            transform: 'translateX(-50%)',
-                        }}
-                    />
-                    <div
-                        style={{
-                            width: `calc(100% - ${imageWidth * 0.75}px + 50px)`,
-                            position: 'absolute',
-                            top: `${imageWidth / 4}px`,
-                            left: `${imageWidth * 0.75}px`,
-                            height: `${imageWidth / 2}px`,
-                        }}
-                    >
-                        <div
-                            className='timer'
-                            style={{
-                                background: '#F46938',
-                                width: `${calculatePercent()}%`,
-                                transition: 'width 1s linear',
-                                color: '#ffffff',
-                                textAlign: 'left',
-                                padding: '10px 0',
-                                height: '100%',
-                                boxShadow: '3px 3px 5px rgba(0, 0, 0, 0.5)',
-                                borderRadius: '0 50px 50px 0',
-                            }}
-                        />
-                    </div>
-                </div>
+                    isNumberVisible={isNumberVisible}
+                    secondsLeft={secondsLeft}
+                />
 
                 <div
                     style={{
@@ -320,16 +229,7 @@ class Game extends Component {
                         height: 'calc(100vh - 200px',
                     }}
                 >
-                    <div
-                        style={{
-                            width: '50vw',
-                            height: '100%',
-                            float: 'left',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'flex-end',
-                        }}
-                    >
+                    <div className='left-side'>
                         <PlayerInfo
                             name={this.state.name}
                             nameSize={this.state.nameSize}
@@ -337,7 +237,10 @@ class Game extends Component {
                             handleChange={this.handleChange}
                         />
                     </div>
-                    <div style={{width: '50vw', height: '100%', float: 'left'}}>
+                    <div
+                        className='right-side'
+                        style={{width: '50vw', height: '100%', float: 'left'}}
+                    >
                         {this.state.isScoreVisible && (
                             <ScoreBoard score={score} />
                         )}
@@ -346,60 +249,95 @@ class Game extends Component {
 
                 {isPortalVisible && (
                     <ExternalPortal>
-                        <button
-                            style={buttonStyle}
-                            onClick={() => this.addTime()}
-                        >
-                            Fill The Timer
-                        </button>
-                        <button
-                            style={{
-                                ...buttonStyle,
-                                cursor: isPlaying ? 'not-allowed' : 'pointer',
-                            }}
-                            onClick={this.toggleScoreVisibility}
-                            disabled={this.isPlaying}
-                        >
-                            {this.state.isScoreVisible ? 'Hide' : 'Show'} Score
-                        </button>
-                        <button style={buttonStyle} onClick={this.startTimer}>
-                            Start!
-                        </button>
-                        <button style={buttonStyle} onClick={this.addToScore}>
-                            Add Point
-                        </button>
-                        <button
-                            style={buttonStyle}
-                            onClick={this.subtractFromScore}
-                        >
-                            Remove Point
-                        </button>
-                        <button
-                            style={buttonStyle}
-                            onClick={e => this.addToScore(e, true)}
-                        >
-                            Add Point After Timer Ends
-                        </button>
-                        <button
-                            style={buttonStyle}
-                            onClick={this.updateScoreboard}
-                        >
-                            Start New Round
-                        </button>
-                        <button
-                            style={buttonStyle}
-                            onClick={this.decreaseNameSize}
-                        >
-                            Smaller Name
-                        </button>
-                        <button
-                            style={buttonStyle}
-                            onClick={this.increaseNameSize}
-                        >
-                            Larger Name
-                        </button>
-                        <p>You are {!isPlaying && 'not'} playing.</p>
-                        <p>You are on round {this.state.currentRound}.</p>
+                        <div className='portal-sections'>
+                            <div>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={() => this.addTime()}
+                                >
+                                    Fill The Timer
+                                </button>
+                                <button
+                                    style={{
+                                        ...buttonStyle,
+                                        cursor: isPlaying
+                                            ? 'not-allowed'
+                                            : 'pointer',
+                                    }}
+                                    onClick={this.toggleScoreVisibility}
+                                    disabled={this.isPlaying}
+                                >
+                                    {this.state.isScoreVisible
+                                        ? 'Hide'
+                                        : 'Show'}{' '}
+                                    Score
+                                </button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.startTimer}
+                                >
+                                    Start!
+                                </button>
+                            </div>
+                            <div>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.addToScore}
+                                >
+                                    Add Point
+                                </button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.subtractFromScore}
+                                >
+                                    Remove Point
+                                </button>
+                            </div>
+                            <div>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={e => this.addToScore(e, true)}
+                                >
+                                    Add Point After Timer Ends
+                                </button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.updateScoreboard}
+                                >
+                                    Start New Round
+                                </button>
+                            </div>
+                            <div>
+                                <input
+                                    type='text'
+                                    name='name'
+                                    value={this.state.name}
+                                    onChange={e => this.handleChange(e)}
+                                    placeholder='Player Name'
+                                    style={buttonStyle}
+                                />
+                            </div>
+                            <div>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.decreaseNameSize}
+                                >
+                                    Smaller Name
+                                </button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.increaseNameSize}
+                                >
+                                    Larger Name
+                                </button>
+                            </div>
+                            <p style={buttonStyle}>
+                                You are {!isPlaying && 'not'} playing.
+                            </p>
+                            <p style={buttonStyle}>
+                                You are on round {this.state.currentRound}.
+                            </p>
+                        </div>
                     </ExternalPortal>
                 )}
             </div>

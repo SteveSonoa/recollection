@@ -3,15 +3,8 @@ import PropTypes from 'prop-types';
 
 const PlayerInfo = ({handleChange, name, nameSize, scores}) => (
     <div className='player-info-container'>
-        <div id='player-name'>
-            <input
-                type='text'
-                name='name'
-                value={name}
-                onChange={handleChange}
-                placeholder='Player Name'
-                style={{fontSize: `${nameSize}px`}}
-            />
+        <div id='player-name' style={{fontSize: `${nameSize}px`}}>
+            {name}
         </div>
         <div id='player-scores'>
             <div>{isNaN(scores[0]) ? '' : scores[0]}</div>
