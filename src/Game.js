@@ -7,16 +7,6 @@ import SFX from './SFX';
 import PlayerInfo from './PlayerInfo';
 import CountdownTimer from './CountdownTimer';
 
-/** TODO LIST
- * Add new sfx for timer tick when it reaches 5 seconds or less
- * Add sfx for when timer ends (cheers for high score, disappointed "oh" for low score)
- * Add sfx for when score appears
- * Add sfx for when score moves underneath name (when the round resets)
- * Add bkgnd for player info container
- * Add bkgnd for player info areas (name, round scores, total score)
- * Break sections into components
- */
-
 class Game extends Component {
     constructor() {
         super();
@@ -44,6 +34,13 @@ class Game extends Component {
         this.losePointSfx = document.getElementById('lose-point');
         this.gainPointSfx = document.getElementById('correct-answer');
         this.clockTickSfx = document.getElementById('clock-tick');
+        this.applauseSfx = document.getElementById('applause');
+        this.finalClockTickSfx = document.getElementById('final-tick');
+        this.cheersSfx = document.getElementById('kids-cheering');
+        this.buzzerSfx = document.getElementById('buzzer');
+        this.showScoreSfx = document.getElementById('show-score');
+        this.addToTotalSfx = document.getElementById('add-to-total');
+        this.babyLaughSfx = document.getElementById('baby-laugh');
     };
 
     componentWillUnmount() {
@@ -71,10 +68,15 @@ class Game extends Component {
         this.setState({
             secondsLeft: secondsLeft,
         });
-        this.clockTickSfx.play();
+        if (secondsLeft > 5) {
+            this.clockTickSfx.play();
+        } else if (secondsLeft > 0) {
+            this.finalClockTickSfx.play();
+        }
 
         // Check if we're at zero.
         if (secondsLeft === 0) {
+            this.playGameEndingBuzzer();
             clearInterval(this.timer);
             this.setState({
                 isPlaying: false,
@@ -85,6 +87,15 @@ class Game extends Component {
                 });
             }, 1500);
             this.timer = 0;
+            setTimeout(() => {
+                if (this.state.score >= 20) {
+                    this.cheersSfx.play();
+                } else if (this.state.score >= 5) {
+                    this.applauseSfx.play();
+                } else {
+                    this.babyLaughSfx.play();
+                }
+            }, 500);
         }
     };
 
@@ -147,6 +158,7 @@ class Game extends Component {
         const {isPlaying, isScoreVisible} = this.state;
 
         if (!isPlaying) {
+            if (!isScoreVisible) this.showScoreSfx.play();
             this.setState({
                 isScoreVisible: !isScoreVisible,
             });
@@ -165,6 +177,7 @@ class Game extends Component {
 
             this.toggleScoreVisibility();
             this.resetScore();
+            this.addToTotalSfx.play();
         }
     };
 
@@ -186,6 +199,22 @@ class Game extends Component {
         this.setState({
             nameSize: this.state.nameSize - 8,
         });
+    };
+
+    playGameEndingBuzzer = () => {
+        this.buzzerSfx.play();
+        setTimeout(() => {
+            this.buzzerSfx.pause();
+            this.buzzerSfx.currentTime = 0.0;
+        }, 1000);
+    };
+
+    playApplauseSfx = () => {
+        this.applauseSfx.play();
+    };
+
+    playCheeringSfx = () => {
+        this.cheersSfx.play();
     };
 
     render() {
@@ -211,6 +240,13 @@ class Game extends Component {
                 <SFX id='lose-point' sfxFile='wrong.mp3' />
                 <SFX id='fill-timer' sfxFile='Magic_Chime.mp3' />
                 <SFX id='clock-tick' sfxFile='tick.mp3' />
+                <SFX id='applause' sfxFile='applause.mp3' />
+                <SFX id='final-tick' sfxFile='final-tick-2.mp3' />
+                <SFX id='kids-cheering' sfxFile='kids_cheering.mp3' />
+                <SFX id='buzzer' sfxFile='long-game-show-buzzer.mp3' />
+                <SFX id='show-score' sfxFile='tick-1.mp3' />
+                <SFX id='add-to-total' sfxFile='Stomach_Thumps.mp3' />
+                <SFX id='baby-laugh' sfxFile='babies-laughing.mp3' />
 
                 <CountdownTimer
                     activatePortal={e => {
@@ -337,6 +373,26 @@ class Game extends Component {
                             <p style={buttonStyle}>
                                 You are on round {this.state.currentRound}.
                             </p>
+                            <div>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.setTimerToTen}
+                                >
+                                    Set Timer To 10
+                                </button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.playApplauseSfx}
+                                >
+                                    Applause
+                                </button>
+                                <button
+                                    style={buttonStyle}
+                                    onClick={this.playCheeringSfx}
+                                >
+                                    Cheering
+                                </button>
+                            </div>
                         </div>
                     </ExternalPortal>
                 )}
