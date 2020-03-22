@@ -66,16 +66,42 @@ input:focus {
     outline: 0;
 }
 
+.left-side,
+.right-side {
+    width: 50vw;
+    height: 100%;
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.scoreboard {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 600px;
+    font-weight: 900;
+    color: #ffffff;
+    box-sizing: border-box;
+    text-shadow: 10px 0 #00b7ff, 0 10px #00b7ff, -10px 0 #00b7ff,
+        0 -10px #00b7ff, 10px 10px #00b7ff, -10px -10px #00b7ff,
+        10px -10px #00b7ff, -10px 10px #00b7ff;
+}
+
 .player-info-container {
     width: 800px;
     overflow: hidden;
-
     background: rgba(112, 49, 155, 0.85);
     border-radius: 25px;
     padding: 10px;
     border: 5px solid #ff0;
     box-sizing: border-box;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    align-self: flex-end;
+    margin-bottom: 25px;
 }
 
 #player-name {
@@ -90,6 +116,7 @@ input:focus {
     background: rgba(0, 0, 0, 0.25);
     text-shadow: 2px 2px #ed558c, -2px 2px #ed558c, 2px -2px #ed558c,
         -2px -2px #ed558c;
+    text-transform: capitalize;
 }
 
 #player-scores {
@@ -172,13 +199,4 @@ input:focus {
 
 .portal-sections div {
     margin-bottom: 10px;
-}
-
-.left-side {
-    width: 50vw;
-    height: 100%;
-    float: left;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
 }
