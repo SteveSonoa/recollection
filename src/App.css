@@ -118,13 +118,25 @@ input:focus {
 }
 
 #player-scores div::before {
-    content: 'ROUND 1';
+    content: "ROUND 1";
     position: absolute;
     top: 0;
     left: 50%;
     transform: translate(-50%, 0);
     font-size: 12px;
     font-weight: 900;
+}
+
+#player-scores div[data-round-number="1"]::before {
+    content: "ROUND 1";
+}
+
+#player-scores div[data-round-number="2"]::before {
+    content: "ROUND 2";
+}
+
+#player-scores div[data-round-number="3"]::before {
+    content: "ROUND 3";
 }
 
 #player-scores div:first-child {
@@ -149,7 +161,7 @@ input:focus {
 }
 
 #total-score::before {
-    content: 'TOTAL SCORE';
+    content: "TOTAL SCORE";
     font-size: 14px;
     position: absolute;
     top: 0;
