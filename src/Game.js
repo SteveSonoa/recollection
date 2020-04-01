@@ -62,6 +62,7 @@ class Game extends Component {
             score: 0,
             secondsLeft: 0
         });
+        clearInterval(this.timer);
         this.timer = 0;
         this.music.pause();
         this.music.currentTime = 0.0;
