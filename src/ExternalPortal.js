@@ -10,7 +10,7 @@ class ExternalPortal extends React.PureComponent {
 
     componentDidMount() {
         this.window = window.open("", "", "width=600,height=500");
-        this.window.document.title = "A React portal window";
+        this.window.document.title = "Remote Control";
         this.window.document.body.appendChild(this.el);
     }
 
